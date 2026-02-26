@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    env_file:
+      - .env
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: sprint-turin-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_FIRST_NAME=${ADMIN_FIRST_NAME}
+      - ADMIN_LAST_NAME=${ADMIN_LAST_NAME}
+    volumes:
+      # Volume persistente per database SQLite
+      - sqlite-data:/app
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: sprint-turin-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  sqlite-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
