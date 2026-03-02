@@ -86,6 +86,12 @@ export default function CreatePollPage() {
         e.preventDefault();
         setError('');
 
+        // Validazione custom
+        if (!title.trim()) {
+            setError('Inserisci un titolo per il sondaggio');
+            return;
+        }
+
         const validOptions = options.filter((opt) => opt.text.trim() !== '' && opt.capacity > 0);
         if (validOptions.length < 2) {
             setError('Inserisci almeno 2 opzioni valide con capacità maggiore di 0');
@@ -108,7 +114,7 @@ export default function CreatePollPage() {
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to create poll');
+            if (!response.ok) throw new Error('Impossibile creare il sondaggio');
 
             const data = await response.json();
             navigate(`/polls/${data.id}`);
@@ -145,7 +151,6 @@ export default function CreatePollPage() {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="es. Prenotazioni Settimana 10-14 Marzo"
-                            required
                             className="h-12 sm:h-12 text-base"
                         />
                     </div>
@@ -194,7 +199,71 @@ export default function CreatePollPage() {
                                     key={index} 
                                     className="group p-4 sm:p-5 rounded-xl border-2 border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 hover:shadow-md"
                                 >
-                                    <div className="flex items-center gap-3 mb-3">
+                                    {/* Layout Mobile: Verticale */}
+                                    <div className="flex sm:hidden flex-col gap-3">
+                                        <div className="flex items-center gap-3">
+                                            {/* Numero */}
+                                            <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center font-bold text-base shadow-md shadow-primary/20">
+                                                {index + 1}
+                                            </div>
+                                            
+                                            {/* Input Testo */}
+                                            <div className="flex-1 min-w-0">
+                                                <Input
+                                                    type="text"
+                                                    value={option.text}
+                                                    onChange={(e) => updateOptionText(index, e.target.value)}
+                                                    placeholder={index === 0 ? "Lunedì 10/3" : index === 1 ? "Martedì 11/3" : `Giorno ${index + 1}`}
+                                                    className="h-11 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 text-base font-medium"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Capacità e Rimuovi Mobile */}
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2.5 flex-1">
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => decrementCapacity(index)}
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-10 w-10 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </Button>
+                                                <div className="flex items-center gap-2 justify-center flex-1">
+                                                    <Users className="w-5 h-5 text-primary" />
+                                                    <span className="font-bold text-xl tabular-nums text-primary">{option.capacity}</span>
+                                                    <span className="text-sm text-muted-foreground">posti</span>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => incrementCapacity(index)}
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-10 w-10 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+
+                                            {/* Rimuovi Mobile */}
+                                            {options.length > 2 && (
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => removeOption(index)}
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-10 w-10 border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive flex-shrink-0"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Layout Desktop: Inline */}
+                                    <div className="hidden sm:flex items-center gap-3">
                                         {/* Numero */}
                                         <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center font-bold text-base shadow-md shadow-primary/20">
                                             {index + 1}
@@ -207,60 +276,44 @@ export default function CreatePollPage() {
                                                 value={option.text}
                                                 onChange={(e) => updateOptionText(index, e.target.value)}
                                                 placeholder={index === 0 ? "Lunedì 10/3" : index === 1 ? "Martedì 11/3" : `Giorno ${index + 1}`}
-                                                className="h-11 sm:h-12 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 text-base font-medium"
+                                                className="h-12 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-0 text-base font-medium"
                                             />
                                         </div>
 
-                                        {/* Rimuovi (solo desktop) */}
-                                        {options.length > 2 && (
-                                            <Button
-                                                type="button"
-                                                onClick={() => removeOption(index)}
-                                                variant="ghost"
-                                                size="icon"
-                                                className="hidden sm:flex h-9 w-9 opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-destructive-foreground flex-shrink-0"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {/* Capacità e Rimuovi Mobile */}
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="flex items-center gap-3 bg-muted/50 rounded-xl px-3 py-2.5 flex-1">
+                                        {/* Capacità Desktop: Compatta */}
+                                        <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 flex-shrink-0">
                                             <Button
                                                 type="button"
                                                 onClick={() => decrementCapacity(index)}
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-10 w-10 sm:h-9 sm:w-9 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
+                                                className="h-8 w-8 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
                                             >
-                                                <Minus className="w-4 h-4" />
+                                                <Minus className="w-3.5 h-3.5" />
                                             </Button>
-                                            <div className="flex items-center gap-2 justify-center flex-1">
-                                                <Users className="w-5 h-5 sm:w-4 sm:h-4 text-primary" />
-                                                <span className="font-bold text-xl sm:text-lg tabular-nums text-primary">{option.capacity}</span>
-                                                <span className="text-sm text-muted-foreground">posti</span>
+                                            <div className="flex items-center gap-1.5">
+                                                <Users className="w-4 h-4 text-primary" />
+                                                <span className="font-bold text-base tabular-nums text-primary min-w-[1.5rem] text-center">{option.capacity}</span>
                                             </div>
                                             <Button
                                                 type="button"
                                                 onClick={() => incrementCapacity(index)}
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-10 w-10 sm:h-9 sm:w-9 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
+                                                className="h-8 w-8 rounded-lg border-primary/20 hover:border-primary hover:bg-primary/10 flex-shrink-0"
                                             >
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-3.5 h-3.5" />
                                             </Button>
                                         </div>
 
-                                        {/* Rimuovi (solo mobile) */}
+                                        {/* Rimuovi Desktop */}
                                         {options.length > 2 && (
                                             <Button
                                                 type="button"
                                                 onClick={() => removeOption(index)}
-                                                variant="outline"
+                                                variant="ghost"
                                                 size="icon"
-                                                className="sm:hidden h-10 w-10 border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive flex-shrink-0"
+                                                className="h-9 w-9 opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-destructive-foreground flex-shrink-0"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

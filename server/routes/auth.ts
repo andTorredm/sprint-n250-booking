@@ -13,7 +13,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
         if (!email || !password || !firstName || !lastName) {
             logger.warn(`Registration rejected: missing fields for ${email || 'unknown'}`);
-            return res.status(400).json({ error: 'All fields are required' });
+            return res.status(400).json({ error: 'Tutti i campi sono obbligatori' });
         }
 
         const existingUser = await dbGet('SELECT * FROM users WHERE email = ?', [
@@ -22,7 +22,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
         if (existingUser) {
             logger.warn(`Registration rejected: email already exists - ${email}`);
-            return res.status(400).json({ error: 'Email already registered' });
+            return res.status(400).json({ error: 'Email già registrata' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -52,7 +52,7 @@ router.post('/register', async (req: Request, res: Response) => {
         });
     } catch (error) {
         logger.error(`Registration error for ${req.body.email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 
@@ -62,7 +62,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
         if (!email || !password) {
             logger.warn(`Login rejected: missing credentials for ${email || 'unknown'}`);
-            return res.status(400).json({ error: 'Email and password are required' });
+            return res.status(400).json({ error: 'Email e password sono obbligatori' });
         }
 
         const user: any = await dbGet('SELECT * FROM users WHERE email = ?', [
@@ -71,14 +71,14 @@ router.post('/login', async (req: Request, res: Response) => {
 
         if (!user) {
             logger.warn(`Login rejected: user not found - ${email}`);
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Credenziali non valide' });
         }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
             logger.warn(`Login rejected: invalid password for ${email} (user #${user.id})`);
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Credenziali non valide' });
         }
 
         const token = jwt.sign({ userId: user.id, role: user.role, email }, JWT_SECRET, {
@@ -99,7 +99,7 @@ router.post('/login', async (req: Request, res: Response) => {
         });
     } catch (error) {
         logger.error(`Login error for ${req.body.email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 

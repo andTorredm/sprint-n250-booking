@@ -43,7 +43,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         url: req.url,
         method: req.method
     });
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Errore interno del server' });
 });
 
 const startServer = async () => {

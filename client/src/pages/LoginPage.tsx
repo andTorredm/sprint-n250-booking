@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { LogIn, UserPlus, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +15,7 @@ export default function LoginPage() {
     const [lastName, setLastName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { login, register } = useAuth();
     const navigate = useNavigate();
@@ -22,6 +23,33 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Validazione custom
+        if (!email.trim()) {
+            setError('Inserisci un indirizzo email');
+            return;
+        }
+        // Validazione formato email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Inserisci un indirizzo email valido');
+            return;
+        }
+        if (!password.trim()) {
+            setError('Inserisci una password');
+            return;
+        }
+        if (!isLogin) {
+            if (!firstName.trim()) {
+                setError('Inserisci il tuo nome');
+                return;
+            }
+            if (!lastName.trim()) {
+                setError('Inserisci il tuo cognome');
+                return;
+            }
+        }
+
         setLoading(true);
 
         try {
@@ -69,7 +97,6 @@ export default function LoginPage() {
                                             value={firstName}
                                             onChange={(e) => setFirstName(e.target.value)}
                                             placeholder="Mario"
-                                            required
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -80,7 +107,6 @@ export default function LoginPage() {
                                             value={lastName}
                                             onChange={(e) => setLastName(e.target.value)}
                                             placeholder="Rossi"
-                                            required
                                         />
                                     </div>
                                 </div>
@@ -90,24 +116,37 @@ export default function LoginPage() {
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="nome@esempio.it"
-                                    required
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    required
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                        tabIndex={-1}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="w-4 h-4" />
+                                        ) : (
+                                            <Eye className="w-4 h-4" />
+                                        )}
+                                    </button>
+                                </div>
                             </div>
 
                             {error && (

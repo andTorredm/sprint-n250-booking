@@ -38,10 +38,12 @@ export default function PollDetailPage() {
     const navigate = useNavigate();
     const [poll, setPoll] = useState<PollDetail | null>(null);
     const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
+    const [initialSelectedOptions, setInitialSelectedOptions] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [selectedOptionForModal, setSelectedOptionForModal] = useState<number | null>(null);
     const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (!token) {
@@ -61,7 +63,7 @@ export default function PollDetailPage() {
                 },
             });
 
-            if (!response.ok) throw new Error('Failed to fetch poll');
+            if (!response.ok) throw new Error('Impossibile recuperare il sondaggio');
 
             const data = await response.json();
             setPoll(data);
@@ -83,12 +85,14 @@ export default function PollDetailPage() {
 
             const data = await response.json();
             setSelectedOptions(data);
+            setInitialSelectedOptions(data);
         } catch (error) {
         }
     };
 
     const handleVote = async () => {
         setSubmitting(true);
+        setError('');
         try {
             const response = await fetch('/api/votes', {
                 method: 'POST',
@@ -102,11 +106,24 @@ export default function PollDetailPage() {
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to submit vote');
+            if (!response.ok) {
+                if (response.status === 409) {
+                    // Capacità superata
+                    const errorData = await response.json();
+                    setError('Una o più opzioni selezionate hanno raggiunto la capacità massima. I dati sono stati aggiornati.');
+                    // Ricarica i dati per mostrare lo stato aggiornato
+                    await fetchPoll();
+                    await fetchMyVotes();
+                    return;
+                }
+                throw new Error('Impossibile salvare il voto');
+            }
 
+            // Aggiorna lo stato iniziale dopo il salvataggio con successo
+            setInitialSelectedOptions([...selectedOptions]);
             await fetchPoll();
         } catch (error) {
-            alert('Errore durante il salvataggio del voto');
+            setError('Errore durante il salvataggio del voto. Riprova.');
         } finally {
             setSubmitting(false);
         }
@@ -114,6 +131,7 @@ export default function PollDetailPage() {
 
     const handleClosePoll = async () => {
         setShowCloseConfirmation(false);
+        setError('');
 
         try {
             const response = await fetch(`/api/polls/${id}/close`, {
@@ -123,11 +141,11 @@ export default function PollDetailPage() {
                 },
             });
 
-            if (!response.ok) throw new Error('Failed to close poll');
+            if (!response.ok) throw new Error('Impossibile chiudere il sondaggio');
 
             fetchPoll();
         } catch (error) {
-            alert('Errore durante la chiusura del sondaggio');
+            setError('Errore durante la chiusura del sondaggio. Riprova.');
         }
     };
 
@@ -178,6 +196,14 @@ export default function PollDetailPage() {
         return acc;
     }, {} as Record<number, Vote[]>);
 
+    // Verifica se ci sono modifiche rispetto alla selezione iniziale
+    const hasChanges = () => {
+        if (selectedOptions.length !== initialSelectedOptions.length) return true;
+        const sortedSelected = [...selectedOptions].sort();
+        const sortedInitial = [...initialSelectedOptions].sort();
+        return !sortedSelected.every((val, index) => val === sortedInitial[index]);
+    };
+
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
             <Link 
@@ -226,6 +252,13 @@ export default function PollDetailPage() {
                     </Badge>
                 )}
             </div>
+
+            {error && (
+                <div className="mb-6 text-destructive text-sm bg-destructive/10 border border-destructive/30 px-4 py-3 rounded-lg animate-fade-in flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span>{error}</span>
+                </div>
+            )}
 
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Voting Section */}
@@ -296,7 +329,7 @@ export default function PollDetailPage() {
                             <Button
                                 onClick={handleVote}
                                 className="w-full mt-4 h-10 text-sm font-semibold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40"
-                                disabled={submitting || selectedOptions.length === 0}
+                                disabled={submitting || !hasChanges()}
                             >
                                 {submitting ? (
                                     <>

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     env_file:
@@ -18,7 +16,6 @@ services:
       - ADMIN_FIRST_NAME=${ADMIN_FIRST_NAME}
       - ADMIN_LAST_NAME=${ADMIN_LAST_NAME}
     volumes:
-      # Volume persistente per database SQLite
       - sqlite-data:/app
     networks:
       - app-network

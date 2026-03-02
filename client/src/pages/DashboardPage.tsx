@@ -40,7 +40,7 @@ export default function DashboardPage() {
                 },
             });
 
-            if (!response.ok) throw new Error('Failed to fetch polls');
+            if (!response.ok) throw new Error('Impossibile recuperare i sondaggi');
 
             const data = await response.json();
             setPolls(data);

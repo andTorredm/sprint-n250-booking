@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
         res.json(polls);
     } catch (error) {
         logger.error(`Error fetching polls for ${req.userEmail}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 
@@ -38,7 +38,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 
         if (!poll) {
             logger.warn(`Poll #${id} not found - requested by ${req.userEmail}`);
-            return res.status(404).json({ error: 'Poll not found' });
+            return res.status(404).json({ error: 'Sondaggio non trovato' });
         }
 
         const options = await dbAll(
@@ -61,7 +61,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         res.json({ ...poll, options, votes });
     } catch (error) {
         logger.error(`Error fetching poll #${req.params.id} for ${req.userEmail}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 
@@ -77,7 +77,7 @@ router.post(
 
             if (!title || !options || !Array.isArray(options) || options.length === 0) {
                 logger.warn(`Poll creation rejected: invalid data - ${req.userEmail}`);
-                return res.status(400).json({ error: 'Title and options are required' });
+                return res.status(400).json({ error: 'Titolo e opzioni sono obbligatori' });
             }
 
             const result = await dbRun(
@@ -101,7 +101,7 @@ router.post(
             res.status(201).json({ id: pollId, title, description, options });
         } catch (error) {
             logger.error(`Error creating poll for ${req.userEmail}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({ error: 'Errore interno del server' });
         }
     }
 );
@@ -120,10 +120,10 @@ router.put(
 
             logger.info(`Poll #${id} closed by ${req.userEmail}`);
 
-            res.json({ message: 'Poll closed successfully' });
+            res.json({ message: 'Sondaggio chiuso con successo' });
         } catch (error) {
             logger.error(`Error closing poll #${req.params.id} for ${req.userEmail}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({ error: 'Errore interno del server' });
         }
     }
 );

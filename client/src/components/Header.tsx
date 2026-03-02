@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Menu, X, Calendar, User, Mail } from 'lucide-react';
+import { LogOut, Menu, X, Calendar, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Header() {

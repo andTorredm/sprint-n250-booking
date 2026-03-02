@@ -22,7 +22,7 @@ export const authenticateToken = (
 
     if (!token) {
         logger.warn(`Auth rejected: no token - ${req.method} ${req.url}`);
-        return res.status(401).json({ error: 'Access token required' });
+        return res.status(401).json({ error: 'Token di accesso richiesto' });
     }
 
     try {
@@ -37,7 +37,7 @@ export const authenticateToken = (
         next();
     } catch (error) {
         logger.warn(`Auth rejected: invalid/expired token - ${req.method} ${req.url}`);
-        return res.status(403).json({ error: 'Invalid or expired token' });
+        return res.status(403).json({ error: 'Token non valido o scaduto' });
     }
 };
 
@@ -48,7 +48,7 @@ export const requireAdmin = (
 ) => {
     if (req.userRole !== 'ADMIN') {
         logger.warn(`Admin required: user #${req.userId} (${req.userRole}) tried ${req.method} ${req.url}`);
-        return res.status(403).json({ error: 'Admin access required' });
+        return res.status(403).json({ error: 'Accesso riservato agli amministratori' });
     }
     next();
 };
