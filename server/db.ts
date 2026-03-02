@@ -72,6 +72,7 @@ export const initializeDatabase = async () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         pollId INTEGER NOT NULL,
         optionText TEXT NOT NULL,
+        capacity INTEGER NOT NULL DEFAULT 6,
         FOREIGN KEY (pollId) REFERENCES polls(id) ON DELETE CASCADE
       )
     `);

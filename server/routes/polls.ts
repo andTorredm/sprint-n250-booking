@@ -88,9 +88,11 @@ router.post(
             const pollId = result.lastID;
 
             for (const option of options) {
+                const optionText = typeof option === 'string' ? option : option.text;
+                const capacity = typeof option === 'object' && option.capacity ? option.capacity : 6;
                 await dbRun(
-                    'INSERT INTO poll_options (pollId, optionText) VALUES (?, ?)',
-                    [pollId, option]
+                    'INSERT INTO poll_options (pollId, optionText, capacity) VALUES (?, ?, ?)',
+                    [pollId, optionText, capacity]
                 );
             }
 

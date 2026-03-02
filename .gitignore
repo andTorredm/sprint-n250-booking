@@ -15,6 +15,7 @@ server/.env
 server/database.sqlite
 client/dist
 .env
+*.ps1
 
 # Editor directories and files
 .vscode/*

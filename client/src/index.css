@@ -1,48 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: oklch(98% 0.004 260);
-  --color-foreground: oklch(25% 0.015 260);
-  --color-card: oklch(99% 0.003 260);
-  --color-card-foreground: oklch(25% 0.015 260);
-  --color-popover: oklch(99% 0.003 260);
-  --color-popover-foreground: oklch(25% 0.015 260);
-  --color-primary: oklch(60% 0.11 210);
-  --color-primary-foreground: oklch(99% 0.003 210);
-  --color-secondary: oklch(88% 0.08 320);
-  --color-secondary-foreground: oklch(25% 0.015 320);
-  --color-muted: oklch(93% 0.01 260);
-  --color-muted-foreground: oklch(50% 0.02 260);
-  --color-accent: oklch(90% 0.06 210);
-  --color-accent-foreground: oklch(25% 0.015 210);
-  --color-destructive: oklch(85% 0.08 15);
-  --color-destructive-foreground: oklch(30% 0.015 15);
-  --color-border: oklch(88% 0.008 260);
-  --color-input: oklch(88% 0.008 260);
-  --color-ring: oklch(60% 0.11 210);
-  --radius: 0.5rem;
-}
-
-.dark {
-  --color-background: oklch(18% 0.015 260);
-  --color-foreground: oklch(95% 0.005 260);
-  --color-card: oklch(20% 0.015 260);
-  --color-card-foreground: oklch(95% 0.005 260);
-  --color-popover: oklch(20% 0.015 260);
-  --color-popover-foreground: oklch(95% 0.005 260);
-  --color-primary: oklch(65% 0.12 210);
-  --color-primary-foreground: oklch(18% 0.015 210);
-  --color-secondary: oklch(30% 0.05 320);
-  --color-secondary-foreground: oklch(95% 0.005 320);
-  --color-muted: oklch(25% 0.02 260);
-  --color-muted-foreground: oklch(65% 0.02 260);
-  --color-accent: oklch(35% 0.06 210);
-  --color-accent-foreground: oklch(95% 0.005 210);
-  --color-destructive: oklch(70% 0.08 15);
-  --color-destructive-foreground: oklch(18% 0.015 15);
-  --color-border: oklch(28% 0.02 260);
-  --color-input: oklch(28% 0.02 260);
-  --color-ring: oklch(65% 0.12 210);
+  /* Background colors - toni neutri chiari */
+  --color-background: oklch(98% 0.004 150);
+  --color-foreground: oklch(20% 0.015 150);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(20% 0.015 150);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(20% 0.015 150);
+  
+  /* Primary - Verde mela brillante */
+  --color-primary: oklch(70% 0.20 135);
+  --color-primary-foreground: oklch(100% 0 0);
+  
+  /* Secondary - Verde più chiaro */
+  --color-secondary: oklch(88% 0.08 135);
+  --color-secondary-foreground: oklch(25% 0.015 135);
+  
+  /* Muted - Toni neutri */
+  --color-muted: oklch(96% 0.005 150);
+  --color-muted-foreground: oklch(50% 0.015 150);
+  
+  /* Accent - Verde accent */
+  --color-accent: oklch(92% 0.08 140);
+  --color-accent-foreground: oklch(25% 0.015 140);
+  
+  /* Destructive - Rosso maturo per azioni critiche */
+  --color-destructive: oklch(53% 0.18 25);
+  --color-destructive-foreground: oklch(98% 0.01 25);
+  
+  /* Borders */
+  --color-border: oklch(90% 0.005 150);
+  --color-input: oklch(90% 0.005 150);
+  --color-ring: oklch(55% 0.18 160);
+  
+  /* Border radius */
+  --radius: 0.75rem;
 }
 
 * {
@@ -50,6 +43,73 @@
 }
 
 body {
-  background-color: var(--color-background);
+  background: linear-gradient(135deg, 
+    oklch(98% 0.02 160) 0%, 
+    oklch(96.5% 0.025 170) 50%,
+    oklch(97% 0.03 150) 100%);
   color: var(--color-foreground);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, oklch(70% 0.20 135), oklch(72% 0.18 140));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.65) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px -8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
 }
